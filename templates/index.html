@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html >
+<!--From https://codepen.io/frytyler/pen/EGdtg-->
+<head>
+  <meta charset="UTF-8">
+  <title>ML API</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+  
+</head>
+
+<body>
+ <div class="login">
+	<h1>House Price Predictor</h1>
+
+     <!-- Main Input For Receiving Query to our ML -->
+    <form action="{{ url_for('predict')}}"method="post">
+    	Overall material and finish of the house:  
+    	<select id = "OverallQual" name = "OverallQual"> 
+    	<option value=1> Very Poor </option>
+    	<option value=2> Poor </option>
+    	<option value=3> Fair </option>
+    	<option value=4> Below Average </option>
+    	<option value=5> Average </option>
+    	<option value=6> Above Average </option>
+    	<option value=7> Good </option>
+    	<option value=8> Very Good </option>
+    	<option value=9> Excellent </option>
+    	<option value=10> Very Excellent </option>
+    	</select>
+    	<br>
+    	<br>
+        Quality of the material on the exterior:  
+    	<select id = "ExterQual" name = "ExterQual"> 
+    	<option value=1> Poor</option>
+    	<option value=2> Fair </option>
+    	<option value=3> Average/Typical </option>
+    	<option value=4> Good </option>
+    	<option value=5> Excellent</option>
+    	</select>
+    	<br>
+    	<br>
+    	Height of the basement:  
+    	<select id = "BsmtQual" name = "BsmtQual"> 
+    	<option value=0> No Basement</option>
+    	<option value=1> Poor (Less than 70 inches)</option>
+    	<option value=2> Fair (Between 70-79 inches) </option>
+    	<option value=3> Typical (Between 80-89 inches) </option>
+    	<option value=4> Good (Between 90-99 inches) </option>
+    	<option value=5> Excellent (More than 100 inches)</option>
+    	</select>
+    	<br>
+    	<br>
+    	Heating quality and condition:  
+    	<select id = "HeatingQC" name = "HeatingQC"> 
+    	<option value=1> Poor</option>
+    	<option value=2> Fair </option>
+    	<option value=3> Average/Typical </option>
+    	<option value=4> Good </option>
+    	<option value=5> Excellent</option>
+    	</select>
+    	<br>
+    	<br>
+    	Kitchen quality:  
+    	<select id = "KitchenQual" name = "KitchenQual"> 
+    	<option value=1> Poor</option>
+    	<option value=2> Fair </option>
+    	<option value=3> Average/Typical </option>
+    	<option value=4> Good </option>
+    	<option value=5> Excellent</option>
+    	</select>
+    	<br>
+    	<br>
+    	Number Of Fireplaces: <input type="text" name="Fireplaces" id="Fireplaces" value=""><br/>
+    	<br>
+    	Fireplace quality:
+    	<select id = "FireplaceQu" name = "FireplaceQu"> 
+    	<option value=0> No Fireplace</option>
+    	<option value=5> Excellent - Exceptional Masonry Fireplace </option>
+    	<option value=4> Good - Masonry Fireplace in main level </option>
+    	<option value=3> Average - Prefabricated Fireplace in main living area or Masonry Fireplace in basement </option>
+    	<option value=2> Fair - Prefabricated Fireplace in basement </option>
+    	<option value=1> Poor - Ben Franklin Stove </option>
+    	</select>
+    	<br>
+    	Interior finish of the garage:
+    	<select id = "GarageFinish" name = "GarageFinish"> 
+    	<option value=0> No Garage</option>
+    	<option value=1> Unfinished </option>
+    	<option value=2> Rough Finished </option>
+    	<option value=3> Finished </option>
+    	</select>
+    	<br>
+    	<br>
+        Size of garage in car capacity: <input type="text" name="GarageCars" id="GarageCars" value=""><br/>
+        <br>
+    	Number Of Bathrooms(consider single piece bath as half): <input type="text" name="TotalBathRooms" id="TotalBathRooms" value=""><br/>
+    	<br>
+    	Age of the property or last remodeled (in years): <input type="text" name="YearsOld" id="YearsOld" value=""><br/>
+    	<br>
+    	Total Area (includes Above grade (ground) living area, Basement Surface Area, 1st floor surface Area and 2nd floor surface area): <input type="text" name="TotalArea" id="TotalArea" value=""><br/>
+    	<br>
+    	Type of dwelling involved in the sale: 	
+    	<select id = "MSSubClass" name = "MSSubClass">
+    	<option value="MSSubClass_90MS"> DUPLEX - ALL STYLES AND AGES</option>
+    	<option value="MSSubClass_85MS"> SPLIT FOYER </option>
+    	<option value="MSSubClass_80MS"> SPLIT OR MULTI-LEVEL </option>
+    	<option value="MSSubClass_75MS"> 2-1/2 STORY ALL AGES </option>
+    	<option value="MSSubClass_70MS"> 2-STORY 1945 & OLDER </option>
+    	<option value="MSSubClass_60MS"> 2-STORY 1946 & NEWER </option>
+    	<option value="MSSubClass_50MS"> 1-1/2 STORY FINISHED ALL AGES </option>
+    	<option value="MSSubClass_45MS"> 1-1/2 STORY - UNFINISHED ALL AGES </option>
+    	<option value="MSSubClass_30MS"> 1-STORY 1945 & OLDER </option>
+    	<option value="MSSubClass_20MS"> 1-STORY 1946 & NEWER ALL STYLES </option>
+    	<option value="MSSubClass_190MS"> 2 FAMILY CONVERSION - ALL STYLES AND AGES </option>
+    	<option value="MSSubClass_160MS"> 2-STORY PUD - 1946 & NEWER </option>    	
+    	</select>
+    	<br>
+    	<br>
+    	General zoning classification of the sale:
+    	<select id = "MSZoning" name = "MSZoning">
+    	<option value="MSZoning_FV"> Floating Village Residential</option>
+    	<option value="MSZoning_RH"> Residential High Density</option>
+    	<option value="MSZoning_RL"> Residential Low Density</option>
+    	<option value="MSZoning_RM"> Residential Medium Density</option>
+    	</select>    	
+    	<br>
+    	<br>
+    	Is the road access to property paved:
+    	<select id = "street" name = "street">
+    	<option value=1> Yes</option>
+    	<option value=0> No</option>
+    	</select>    	
+    	<br>
+    	<br>
+    	Is the alley access to property paved:
+    	<select id = "alley" name = "alley">
+    	<option value=1> Yes</option>
+    	<option value=0> No</option>
+    	</select>    	
+    	<br>
+    	<br>
+    	Flatness of the property: 
+    	<select id = "LandContour" name = "LandContour">
+    	<option value="LandContour_HLS"> Hillside - Significant slope from side to side</option>
+    	<option value="LandContour_Low"> Depression</option>
+    	<option value="LandContour_Lvl"> Near Flat/Level</option>
+    	</select>
+    	<br>
+    	<br>
+    	Lot configuration:
+    	<select id = "LotConfig" name = "LotConfig">
+    	<option value="LotConfig_CulDSac"> Cul-de-sac</option>
+    	<option value="LotConfig_FR2"> Frontage on 2 sides of property</option>
+    	<option value="LotConfig_Inside"> Inside lot</option>
+    	</select>
+    	<br>
+    	<br>
+    	Neighborhood:
+    	<select id = "Neighborhood" name = "Neighborhood">
+    	<option value="Neighborhood_BrDale"> Briardale</option>
+    	<option value="Neighborhood_BrkSide"> Brookside</option>
+    	<option value="Neighborhood_ClearCr"> Clear Creek</option>
+    	<option value="Neighborhood_CollgCr"> College Creek</option>
+    	<option value="Neighborhood_Crawfor"> Crawford</option>
+    	<option value="Neighborhood_Edwards"> Edwards</option>
+    	<option value="Neighborhood_Gilbert"> Gilbert</option>
+    	<option value="Neighborhood_IDOTRR"> Iowa DOT and Rail Road</option>
+    	<option value="Neighborhood_MeadowV"> Meadow Village</option>
+    	<option value="Neighborhood_Mitchel"> Mitchell</option>
+    	<option value="Neighborhood_NAmes"> North Ames</option>
+    	<option value="Neighborhood_NWAmes"> Northwest Ames</option>
+    	<option value="Neighborhood_NoRidge"> Northridge</option>
+    	<option value="Neighborhood_NridgHt"> Northridge Heights</option>
+    	<option value="Neighborhood_OldTown"> Old Town</option>
+    	<option value="Neighborhood_SWISU"> South & West of Iowa State University</option>
+    	<option value="Neighborhood_Sawyer"> Sawyer</option>
+    	<option value="Neighborhood_SawyerW"> Sawyer West</option>
+    	<option value="Neighborhood_Somerst"> Somerset</option>
+    	<option value="Neighborhood_StoneBr"> Stone Brook</option>
+    	<option value="Neighborhood_Timber"> Timberland</option>
+    	<option value="Neighborhood_Veenker"> Veenker</option>
+    	</select>
+    	<br>
+    	<br>
+    	
+    	Proximity to various conditions:
+    	<select id = "Condition" name = "Condition">
+    	<option value="Artery"> Adjacent to arterial street</option>
+    	<option value="Feedr"> Adjacent to feeder street</option>
+    	<option value="Norm"> Normal</option>
+    	<option value="PosA"> Adjacent to postive off-site feature</option>
+    	<option value="PosN"> Near positive off-site feature--park, greenbelt, etc.</option>
+    	<option value="RRAe"> Adjacent to East-West Railroad</option>
+    	<option value="RRAn"> Adjacent to North-South Railroad</option>
+    	<option value="RRNe"> Within 200' of East-West Railroad</option>
+    	<option value="RRNn"> Within 200' of North-South Railroad</option>
+    	</select>
+    	<br>
+    	<br>
+    	Exterior covering on house:
+    	<select id = "Exterior" name = "Exterior">
+    	<option value="VinylSd"> Vinyl Siding</option>
+    	<option value="MetalSd"> Metal Siding</option>
+    	<option value="Wd Sdng"> Wood Siding</option>
+    	<option value="HdBoard"> Hard Board</option>
+    	<option value="BrkFace"> Brick Face</option>
+    	<option value="WdShing"> Wood Shingles</option>
+    	<option value="CemntBd"> Cement Board</option>
+    	<option value="Plywood"> Plywood</option>
+    	<option value="AsbShng"> Asbestos Shingles</option>
+    	<option value="Stucco"> Stucco</option>
+    	<option value="BrkComm"> Brick Common</option>
+    	<option value="AsphShn"> Asphalt Shingles</option>
+    	<option value="Stone"> Stone</option>
+    	<option value="ImStucc"> Imitation Stucco</option>
+    	<option value="CBlock"> Cinder Block</option>
+    	</select>
+    	<br>
+    	<br>
+    	
+    	Type of dwelling:
+    	<select id = "BldgType" name = "BldgType">
+    	<option value="BldgType_2fmCon"> Two-family Conversion</option>
+    	<option value="BldgType_Duplex"> Duplex</option>
+    	<option value="BldgType_Twnhs"> Townhouse End UnitStucco</option>
+    	<option value="BldgType_TwnhsE"> Townhouse Inside Unit</option>
+    	</select>
+    	<br>
+    	<br>
+    	
+	    Style of dwelling:
+    	<select id = "HouseStyle" name = "HouseStyle">
+    	<option value="HouseStyle_1.5Unf"> One and one-half story: 2nd level unfinished</option>
+    	<option value="HouseStyle_1Story"> One and one-half story: 2nd level finished</option>
+    	<option value="HouseStyle_2.5Unf"> Two and one-half story: 2nd level unfinished</option>
+    	<option value="HouseStyle_2Story"> Two and one-half story: 2nd level finished</option>
+    	<option value="HouseStyle_SFoyer"> Split Foyer</option>
+    	<option value="HouseStyle_SLvl"> Split Level</option>
+    	</select>
+    	<br>
+    	<br>
+    	RoofStyle:
+    	<select id = "RoofStyle" name = "RoofStyle">
+    	<option value="RoofStyle_Gable"> Gable</option>
+    	<option value="RoofStyle_Gambrel"> Gabrel (Barn)</option>
+    	<option value="RoofStyle_Hip">Hip</option>
+    	</select>
+    	<br>
+    	
+    	Roof material:
+    	<select id = "RoofMatl" name = "RoofMatl">
+    	<option value="RoofMatl_CompShg"> Standard (Composite) Shingle</option>
+    	<option value="RoofMatl_Tar&Grv"> Gravel & Tar</option>
+    	</select>
+    	
+    	Masonry veneer type:
+    	<select id = "MasVnrType" name = "MasVnrType">
+    	<option value="MasVnrType_BrkFace"> Brick Face</option>
+    	<option value="MasVnrType_Stone"> Stone</option>
+    	<option value="MasVnrType_None"> Don't Know</option>
+    	</select>
+    	<br>
+    	<br>
+    	Type of foundation:
+    	<select id = "Foundation" name = "Foundation">
+    	<option value="Foundation_CBlock"> Cinder Block</option>
+    	<option value="Foundation_PConc"> Poured Contrete</option>
+    	<option value="Foundation_Slab"> Slab</option>
+    	</select>
+    	<br>
+    	<br>
+    	Type of heating:
+    	<select id = "Heating" name = "Heating">
+    	<option value="Heating_GasA"> Gas forced warm air furnace</option>
+    	<option value="Heating_GasW"> Gas hot water or steam heat</option>
+    	</select>
+    	<br>
+    	<br>
+    	
+    	Central air conditioning:
+    	<select id = "CentralAir" name = "CentralAir">
+    	<option value=0> No</option>
+    	<option value=1> Yes</option>
+    	</select>
+    	<br>
+    	<br>
+    	Electrical system:
+    	<select id = "Electrical" name = "Electrical">
+    	<option value="Electrical_FuseF"> 60 AMP Fuse Box and mostly Romex wiring (Fair)</option>
+    	<option value="Electrical_SBrkr"> Standard Circuit Breakers & Romex</option>
+    	</select>
+    	<br>
+    	<br>
+    	
+    	Home functionality:
+    	<select id = "Functional" name = "Functional">
+    	<option value="Functional_Min1"> Minor Deductions 1</option>
+    	<option value="Functional_Min2"> Minor Deductions 2</option>
+    	<option value="Functional_Mod"> Moderate Deductions</option>
+    	<option value="Functional_Typ"> Typical Functionality</option>
+    	</select>
+    	<br>
+    	<br>
+    	
+    	Garage location:
+    	<select id = "GarageType" name = "GarageType">
+    	<option value="GarageType_Attchd"> Attached to home</option>
+    	<option value="GarageType_Basment"> Basement Garage</option>
+    	<option value="GarageType_BuiltIn"> Built-In</option>
+    	<option value="GarageType_Detchd"> Detached from home</option>
+    	<option value="GarageType_none"> No Garage</option>
+    	</select>
+    	<br>
+    	<br>
+    	Fence quality:
+    	<select id = "Fence" name = "Fence">
+    	<option value="Fence_GdWo"> Good Privacy</option>
+    	<option value="Fence_MnPrv"> Minimum Privacy</option>
+    	<option value="Fence_MnWw"> Minimum Wood/Wire</option>
+    	</select>
+    	<br>
+    	<br>
+    	Is there a shed in this property :
+    	<select id = "MiscFeature_Shed" name = "MiscFeature_Shed">
+    	<option value=1> Yes</option>
+    	<option value=0> No</option>
+    	</select>    	
+    	<br>
+    	<br>
+    	Type of sale:
+    	<select id = "SaleType" name = "SaleType">
+        <option value="SaleType_New"> Home just constructed and sold</option>
+        <option value="SaleType_WD"> Warranty Deed - Conventional</option>
+    	</select>
+    	<br>
+    	<br>
+    	Condition of sale:
+    	<select id = "SaleCondition" name = "SaleCondition">
+        <option value="SaleCondition_Alloca"> Allocation - two linked properties with separate deeds, typically condo with a garage unit</option>
+        <option value="SaleCondition_Family"> Sale between family members</option>
+        <option value="SaleCondition_Normal"> Normal Sale</option>
+    	</select>
+    	<br>
+    	<br>    	    	
+        <button type="submit" class="btn btn-primary btn-block btn-large">Predict</button>
+    </form>
+
+   <br>
+   <br>
+   {{ prediction_text }}
+
+ </div>
+
+
+</body>
+</html>
