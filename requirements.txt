@@ -83,9 +83,11 @@ prompt-toolkit==3.0.2
 Pygments==2.5.2
 pylint==2.4.4
 pyparsing==2.4.6
+pypiwin32==223
 pyrsistent==0.15.7
 python-dateutil==2.8.1
 pytz==2019.3
+pywin32==227
 pywinpty==0.5.7
 PyYAML==5.3
 pyzillow==0.5.5
