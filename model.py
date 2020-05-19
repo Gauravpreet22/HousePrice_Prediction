@@ -19,6 +19,7 @@ from scipy.stats import boxcox_normmax
 from sklearn.metrics import r2_score
 from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import Ridge
+from sklearn.linear_model import Lasso
 from sklearn.model_selection import GridSearchCV
 import pickle
 import requests
@@ -357,8 +358,7 @@ scores
 ### But Before that lets try using Ridge and Lasso Regression which are quite immune to outliers due to regulaization. 
 
 def rmse_cv(model):
-    rmse= np.sqrt(cross_val_score(model, ind_var, dep_var, scoring="explained_variance", cv = 5))
-    # rmse= np.sqrt(-cross_val_score(model, ind_var, dep_var, scoring="neg_mean_squared_error", cv = 5))
+    rmse= np.sqrt(-cross_val_score(model, ind_var, dep_var, scoring="neg_mean_squared_error", cv = 5))
     return(rmse)
 
 alphas = [0.05, 0.1, 0.3, 1, 3, 6, 5, 7, 10, 15, 30, 50, 75]
@@ -369,11 +369,29 @@ ridgevis = pd.Series(cv_ridge, index=alphas)
 ridgevis = ridgevis.reset_index()
 ridgevis.columns = ['Aphas', 'RMSE']
 # ridgevis = ridgevis.loc[ridgevis['RMSE'] == np.min(ridgevis['RMSE'])]
-ridgevis = ridgevis.loc[ridgevis['RMSE'] == np.max(ridgevis['RMSE'])]
+ridgevis = ridgevis.loc[ridgevis['RMSE'] == np.min(ridgevis['RMSE'])]
 
 ridge_model = Ridge(alpha = 6)
 ridge_model.fit(x_train, y_train)
 y_pred = ridge_model.predict(x_test.head(1))
+
+## Lasso Regression
+
+alphas = [0.0001, 0.001, 0.01, 0.05, 0.1, 0.3, 1, 3, 6, 5, 7, 10, 15, 30, 50, 75]
+cv_Lasso = [rmse_cv(Lasso(alpha = alpha, normalize=True)).mean() 
+            for alpha in alphas]
+cv_Lasso_df = pd.DataFrame(cv_Lasso, alphas).reset_index()
+cv_Lasso_df.columns = ['Alpha', 'Value']
+minval = cv_Lasso_df.loc[cv_Lasso_df['Value'] == min(cv_Lasso_df['Value'])]['Alpha']
+
+Lasso_model  = Lasso(alpha=minval[0])
+Lasso_model  = Lasso_model.fit(x_train, y_train)
+
+Coef_df = pd.DataFrame(Lasso_model.coef_, x_train.columns).reset_index()
+Coef_df.columns  = ["Column", "Coeff"]
+
+imp_features = Coef_df.loc[Coef_df['Coeff']>0]['Column']
+unimp_features = Coef_df.loc[Coef_df['Coeff']==0]['Column']
 
 ## Creating a pickle file ##
 
@@ -383,15 +401,22 @@ Ridge_model = pickle.load(open('Ridge_model.pkl', 'rb'))
 pickle.dump(reg, open('Linear_reg_model.pkl','wb'))
 Linear_reg_model = pickle.load(open('Linear_reg_model.pkl', 'rb'))
 
-listofcol = x_test.dtypes.reset_index()
+pickle.dump(Lasso_model, open('Lasso_model.pkl','wb'))
+Lasso_model = pickle.load(open('Lasso_model.pkl', 'rb'))
+
+######################### Rough Code ##############################
+
+# lassores = Lasso_model.predict(([[6,3,3,3,3,0,0,2,1,1.5,3,8.06965530688616,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,1,0,1,0,0,1,0,1,0,1,0,0,0,1,1,0,0,0,0,0,1,0,0,0,1,0,0,1]]))
+# math.exp(lassores)
+# listofcol = x_test.dtypes.reset_index()
 # res = (Ridge_model.predict([[6,3,3,3,3,0,0,2,1,1.5,3,8.06965530688616,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,1,0,1,0,0,1,0,1,0,1,0,0,0,1,1,0,0,0,0,0,1,0,0,0,1,0,0,1]]))
 
-res = (Linear_reg_model.predict([[6,3,3,3,3,0,0,2,1,1.5,3,8.06965530688616,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,1,0,1,0,0,1,0,1,0,1,0,0,0,1,1,0,0,0,0,0,1,0,0,0,1,0,0,1]]))
-print(math.exp(res))
+# res = (Linear_reg_model.predict([[6,3,3,3,3,0,0,2,1,1.5,3,8.06965530688616,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,1,0,1,0,0,1,0,1,0,1,0,0,0,1,1,0,0,0,0,0,1,0,0,0,1,0,0,1]]))
+# print(math.exp(res))
 
-data = housing_df[['BldgType', 'SalePrice']]
-f, ax = plt.subplots(figsize=(7, 7))
-fig = sns.boxplot(x='BldgType', y="SalePrice", data=data)
+# data = housing_df[['BldgType', 'SalePrice']]
+# f, ax = plt.subplots(figsize=(7, 7))
+# fig = sns.boxplot(x='BldgType', y="SalePrice", data=data)
 
 
 # print(np.array(x_test.iloc[:1,:]))
