@@ -12,7 +12,8 @@ import math
 
 app = Flask(__name__)
 Ridge_model = pickle.load(open('Ridge_model.pkl', 'rb'))
-# Linear_reg_model = pickle.load(open('Linear_reg_model.pkl', 'rb'))
+Lasso_model = pickle.load(open('Lasso_model.pkl', 'rb'))
+Linear_reg_model = pickle.load(open('Linear_reg_model.pkl', 'rb'))
 
 def response_to_numeric(resp_arr, resp_value):
     response_list = []
@@ -162,7 +163,7 @@ def predict():
     SaleCondition_Num_resp = response_to_numeric(['SaleCondition_Alloca', 'SaleCondition_Family','SaleCondition_Normal'],SaleCondition_sel_resp)
     output = np.append(output, SaleCondition_Num_resp)    
     
-    prediction = Ridge_model.predict([output.astype(float)])
+    prediction = Lasso_model.predict([output.astype(float)])
     # prediction = Linear_reg_model.predict([output.astype(float)])
     fin_pred = math.exp(prediction[0])
     # final_pred = round(prediction[0],2)
